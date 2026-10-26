@@ -1,7 +1,4 @@
-"use client";
-
-import React from "react";
-import RuteView from "@/components/rute/RuteView";
+import { RuteView } from "@/features/rute";
 
 export default function RutePage() {
   return <RuteView />;

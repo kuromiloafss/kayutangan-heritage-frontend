@@ -1,5 +1,5 @@
-import Login from "@/pages/Login";
+import { LoginView } from "@/features/auth";
 
 export default function Home() {
-  return <Login />;
+  return <LoginView />;
 }
