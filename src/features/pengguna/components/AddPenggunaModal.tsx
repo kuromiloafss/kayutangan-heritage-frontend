@@ -1,33 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { PenggunaFormData } from "@/types/pengguna.types";
+import type { PenggunaFormData, UserItem } from "@/types/pengguna.types";
 
 interface AddPenggunaModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (formData: PenggunaFormData) => void;
+  editData?: UserItem | null;
 }
 
 export default function AddPenggunaModal({
   isOpen,
   onClose,
   onSubmit,
+  editData,
 }: AddPenggunaModalProps) {
-  const [fullName, setFullName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (isOpen && editData) {
+      setFullName(editData.name);
+      setEmail(editData.email);
+      setPhoneNumber("");
+      setPassword("");
+    } else if (isOpen && !editData) {
+      setFullName("");
+      setEmail("");
+      setPhoneNumber("");
+      setPassword("");
+    }
+  }, [isOpen, editData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     onSubmit({
       fullName,
       email,
       phoneNumber,
       password,
     });
+
     handleClose();
   };
 
@@ -70,7 +88,9 @@ export default function AddPenggunaModal({
                   id="modal-add-user-title"
                   className="text-xl font-bold text-[#2a3821] tracking-tight"
                 >
-                  Tambah Pengguna
+                  {editData
+                  ? "Perbarui informasi akun pengguna."
+                  : "Lengkapi informasi pengguna yang akan ditambahkan."}
                 </h2>
                 <p className="text-xs text-neutral-400 mt-1 font-normal">
                   Lengkapi informasi pengguna yang akan ditambahkan.
@@ -140,7 +160,7 @@ export default function AddPenggunaModal({
                 <input
                   id="userPhone"
                   type="tel"
-                  required
+                  required={!editData}
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="Contoh: 128172372"
@@ -159,7 +179,7 @@ export default function AddPenggunaModal({
                 <input
                   id="userPassword"
                   type="password"
-                  required
+                  required={!editData}
                   minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -185,7 +205,7 @@ export default function AddPenggunaModal({
                   type="submit"
                   className="px-6 py-3 sm:py-2 text-sm sm:text-xs font-medium text-white bg-[#718255] hover:bg-[#607044] rounded-xl shadow-xs transition cursor-pointer"
                 >
-                  Simpan
+                  {editData ? "Simpan Perubahan" : "Simpan"}
                 </motion.button>
               </footer>
             </form>

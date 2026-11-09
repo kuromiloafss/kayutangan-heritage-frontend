@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import RowActions from "@/components/shared/RowActions";
@@ -13,13 +14,47 @@ interface RuteTableProps {
   onDelete?: (id: number) => void;
 }
 
-export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
+const ITEMS_PER_PAGE = 10;
+
+export default function RuteTable({
+  data,
+  onEdit,
+  onDelete,
+}: RuteTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(data.length / ITEMS_PER_PAGE)
+  );
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedData = data.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const startItem = data.length === 0 ? 0 : startIndex + 1;
+  const endItem = Math.min(
+    startIndex + ITEMS_PER_PAGE,
+    data.length
+  );
+
   return (
     <article className="bg-white rounded-3xl p-4 sm:p-7 border border-neutral-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] relative z-10">
       {/* Tampilan Kartu (Mobile) */}
       <ul className="md:hidden divide-y divide-neutral-100">
-        {data.map((item) => (
-          <li key={item.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+        {paginatedData.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+          >
             <div className="relative w-16 h-14 rounded-xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-100 shrink-0">
               <Image
                 src={item.image}
@@ -28,14 +63,17 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
                 className="object-cover"
               />
             </div>
+
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-neutral-800 truncate">
                 {item.name}
               </p>
+
               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                 <span className="inline-block px-2.5 py-0.5 bg-neutral-100/90 text-neutral-600 rounded-full text-[11px] font-medium border border-neutral-200/50">
                   {item.category}
                 </span>
+
                 <span
                   className={`inline-block shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                     item.status === "Aktif"
@@ -47,11 +85,12 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
                 </span>
               </div>
             </div>
+
             <RowActions
               label="Rute"
               variant="card"
-              onEdit={() => onEdit && onEdit(item)}
-              onDelete={() => onDelete && onDelete(item.id)}
+              onEdit={() => onEdit?.(item)}
+              onDelete={() => onDelete?.(item.id)}
             />
           </li>
         ))}
@@ -69,15 +108,18 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
               <th className="pb-4 font-semibold text-center w-28">Aksi</th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-neutral-100 text-xs">
-            {data.map((item, index) => (
+            {paginatedData.map((item, index) => (
               <motion.tr
                 key={item.id}
-                whileHover={{ backgroundColor: "rgba(250, 249, 245, 0.7)" }}
+                whileHover={{
+                  backgroundColor: "rgba(250, 249, 245, 0.7)",
+                }}
                 className="transition-colors group"
               >
                 <td className="py-4 text-center text-neutral-600 font-medium">
-                  {index + 1}
+                  {startIndex + index + 1}
                 </td>
 
                 <td className="py-4">
@@ -90,6 +132,7 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
                         className="object-cover"
                       />
                     </div>
+
                     <span className="font-medium text-neutral-800">
                       {item.name}
                     </span>
@@ -118,8 +161,8 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
                   <RowActions
                     label="Rute"
                     variant="table"
-                    onEdit={() => onEdit && onEdit(item)}
-                    onDelete={() => onDelete && onDelete(item.id)}
+                    onEdit={() => onEdit?.(item)}
+                    onDelete={() => onDelete?.(item.id)}
                   />
                 </td>
               </motion.tr>
@@ -128,7 +171,12 @@ export default function RuteTable({ data, onEdit, onDelete }: RuteTableProps) {
         </table>
       </div>
 
-      <TablePagination summary="Menampilkan 1-5 dari 28 detail" totalPages={5} />
+      <TablePagination
+        summary={`Menampilkan ${startItem}-${endItem} dari ${data.length} detail`}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </article>
   );
 }

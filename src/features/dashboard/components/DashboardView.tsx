@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import StatCard from "@/components/shared/StatCard";
 import IncomeChartCard from "@/components/shared/IncomeChartCard";
@@ -8,6 +9,7 @@ import CategoryPieCard from "@/components/shared/CategoryPieCard";
 import DashboardHeader from "./DashboardHeader";
 import VisitChartCard from "./VisitChartCard";
 import RecentActivitiesTable from "./RecentActivitiesTable";
+import { PeriodSelection } from "@/components/shared/PeriodModal";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -30,7 +32,25 @@ const itemVariants: Variants = {
   },
 };
 
+const getTodayDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 export default function DashboardView() {
+  const today = getTodayDate();
+
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodSelection>({
+    type: "today",
+    label: "Hari Ini",
+    startDate: today,
+    endDate: today,
+  });
+
   return (
     <motion.main
       variants={containerVariants}
@@ -38,7 +58,10 @@ export default function DashboardView() {
       animate="visible"
       className="space-y-6"
     >
-      <DashboardHeader />
+      <DashboardHeader
+        selectedPeriod={selectedPeriod}
+        onSelectPeriod={setSelectedPeriod}
+      />
 
       {/* 5 Kartu Statistik Ringkasan */}
       <motion.section
@@ -56,6 +79,7 @@ export default function DashboardView() {
             </svg>
           }
         />
+
         <StatCard
           title="Total Tempat Wisata"
           value="342"
@@ -66,6 +90,7 @@ export default function DashboardView() {
             </svg>
           }
         />
+
         <StatCard
           title="Total Pengguna"
           value="1.245"
@@ -76,6 +101,7 @@ export default function DashboardView() {
             </svg>
           }
         />
+
         <StatCard
           title="Total Tiket Terjual"
           value="342"
@@ -86,6 +112,7 @@ export default function DashboardView() {
             </svg>
           }
         />
+
         <StatCard
           title="Total Rute"
           value="12"
@@ -105,8 +132,12 @@ export default function DashboardView() {
         className="grid grid-cols-1 lg:grid-cols-12 gap-5"
       >
         <div className="lg:col-span-7">
-          <IncomeChartCard />
+          <IncomeChartCard
+            startDate={selectedPeriod.startDate}
+            endDate={selectedPeriod.endDate}
+          />
         </div>
+
         <div className="lg:col-span-5">
           <CategoryPieCard />
         </div>
@@ -119,8 +150,12 @@ export default function DashboardView() {
         className="grid grid-cols-1 lg:grid-cols-12 gap-5"
       >
         <div className="lg:col-span-6">
-          <VisitChartCard />
-        </div>
+        <VisitChartCard
+        startDate={selectedPeriod.startDate}
+        endDate={selectedPeriod.endDate}
+        />
+      </div>
+
         <div className="lg:col-span-6">
           <RecentActivitiesTable />
         </div>

@@ -1,7 +1,9 @@
+
 "use client";
 
 import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+
 import { DashboardView } from "@/features/dashboard";
 import { PlacesView } from "@/features/places";
 import { RuteView } from "@/features/rute";
@@ -14,65 +16,37 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get("tab") || "dashboard";
 
+  const validTabs = [
+    "dashboard",
+    "tempat",
+    "rute",
+    "kategori",
+    "tiket",
+    "pendapatan",
+    "pengguna",
+  ];
+
   return (
     <>
-      {/* 1. DASHBOARD UTAMA */}
-      {currentTab === "dashboard" && <DashboardView key="dashboard-view" />}
-
-      {/* 2. KELOLA TEMPAT */}
-      {currentTab === "tempat" && (
-        <div key="places-view">
-          <PlacesView />
-        </div>
+      {currentTab === "dashboard" && (
+        <DashboardView key="dashboard-view" />
       )}
 
-      {/* 3. KELOLA RUTE */}
-      {currentTab === "rute" && (
-        <div key="rute-view">
-          <RuteView />
-        </div>
-      )}
+      {currentTab === "tempat" && <PlacesView />}
 
-      {/* 4. KELOLA KATEGORI */}
-      {currentTab === "kategori" && (
-        <div key="category-view">
-          <CategoryView />
-        </div>
-      )}
+      {currentTab === "rute" && <RuteView />}
 
-      {/* 5. KELOLA TIKET */}
-      {currentTab === "tiket" && (
-        <div key="ticket-view">
-          <TicketView />
-        </div>
-      )}
+      {currentTab === "kategori" && <CategoryView />}
 
-      {/* 6. LAPORAN PENDAPATAN */}
-      {currentTab === "pendapatan" && (
-        <div key="pendapatan-view">
-          <PendapatanView />
-        </div>
-      )}
+      {currentTab === "tiket" && <TicketView />}
 
-      {/* 7. KELOLA PENGGUNA */}
-      {currentTab === "pengguna" && (
-        <div key="pengguna-view">
-          <PenggunaView />
-        </div>
-      )}
+      {currentTab === "pendapatan" && <PendapatanView />}
 
-      {/* TAB TIDAK DIKENAL (HANYA MUNCUL JIKA QUERY PARAMETER SALAH KETIK) */}
-      {![
-        "dashboard",
-        "tempat",
-        "rute",
-        "kategori",
-        "tiket",
-        "pendapatan",
-        "pengguna",
-      ].includes(currentTab) && (
-        <div className="p-8 bg-white rounded-3xl border border-neutral-100 shadow-sm text-center">
-          <p className="text-sm text-neutral-500 font-medium">
+      {currentTab === "pengguna" && <PenggunaView />}
+
+      {!validTabs.includes(currentTab) && (
+        <div className="p-8 bg-white rounded-3xl border text-center">
+          <p className="text-sm text-neutral-500">
             Menu tidak ditemukan.
           </p>
         </div>
@@ -83,7 +57,13 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-neutral-400 text-xs">Memuat data...</div>}>
+    <Suspense
+      fallback={
+        <div className="p-6">
+          Memuat dashboard...
+        </div>
+      }
+    >
       <DashboardContent />
     </Suspense>
   );

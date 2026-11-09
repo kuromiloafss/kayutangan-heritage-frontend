@@ -6,13 +6,19 @@ export interface PlaceItem {
   name: string;
   category: string;
   status: ActiveStatus;
+  description?: string;
+  location?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
-/** Data dari form "Tambah Tempat". */
 export interface PlaceFormData {
   name: string;
   category: string;
   description: string;
   image: string;
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  imageFile?: File;
 }

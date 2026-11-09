@@ -13,13 +13,20 @@ export default function PenggunaView() {
     searchTerm,
     setSearchTerm,
     filteredUsers,
+    editingUser,
     handleEdit,
+    handleCancelEdit,
+    handleUpdateUser,
     handleDelete,
     handleAddNewUser,
   } = usePengguna();
 
-  // State untuk modal Tambah Pengguna
-  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+    handleCancelEdit();
+  };
 
   return (
     <>
@@ -42,11 +49,20 @@ export default function PenggunaView() {
         />
       </motion.section>
 
-      {/* Pop-up Tambah Pengguna */}
       <AddPenggunaModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddNewUser}
+        key={editingUser?.id ?? "new"}
+        isOpen={isAddModalOpen || editingUser !== null}
+        onClose={handleCloseModal}
+        onSubmit={(data) => {
+          if (editingUser) {
+            handleUpdateUser(data);
+          } else {
+            handleAddNewUser(data);
+          }
+
+          setIsAddModalOpen(false);
+        }}
+        editData={editingUser}
       />
     </>
   );

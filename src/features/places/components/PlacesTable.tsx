@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import RowActions from "@/components/shared/RowActions";
@@ -13,13 +14,51 @@ interface PlacesTableProps {
   onDelete?: (id: number) => void;
 }
 
-export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps) {
+const ITEMS_PER_PAGE = 10;
+
+export default function PlacesTable({
+  data,
+  onEdit,
+  onDelete,
+}: PlacesTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(data.length / ITEMS_PER_PAGE)
+  );
+
+  // Kembali ke halaman yang tersedia jika data berkurang
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  // Mengambil maksimal 10 data sesuai halaman
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(
+    startIndex + ITEMS_PER_PAGE,
+    data.length
+  );
+
+  const currentData = data.slice(startIndex, endIndex);
+
+  const summary =
+    data.length === 0
+      ? "Menampilkan 0 dari 0 detail"
+      : `Menampilkan ${startIndex + 1}-${endIndex} dari ${data.length} detail`;
+
   return (
     <article className="bg-white rounded-3xl p-4 sm:p-7 border border-neutral-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] relative z-10">
+
       {/* Tampilan Kartu (Mobile) */}
       <ul className="md:hidden divide-y divide-neutral-100">
-        {data.map((item) => (
-          <li key={item.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+        {currentData.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+          >
             <div className="relative w-16 h-14 rounded-xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-100 shrink-0">
               <Image
                 src={item.image}
@@ -28,14 +67,17 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
                 className="object-cover"
               />
             </div>
+
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-neutral-800 truncate">
                 {item.name}
               </p>
+
               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                 <span className="inline-block px-2.5 py-0.5 bg-neutral-100/90 text-neutral-600 rounded-full text-[11px] font-medium border border-neutral-200/50">
                   {item.category}
                 </span>
+
                 <span
                   className={`inline-block shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                     item.status === "Aktif"
@@ -47,6 +89,7 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
                 </span>
               </div>
             </div>
+
             <RowActions
               label="Tempat"
               variant="card"
@@ -70,19 +113,22 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
               <th className="pb-4 font-semibold text-center w-28">Aksi</th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-neutral-100 text-xs">
-            {data.map((item, index) => (
+            {currentData.map((item, index) => (
               <motion.tr
                 key={item.id}
-                whileHover={{ backgroundColor: "rgba(250, 249, 245, 0.7)" }}
+                whileHover={{
+                  backgroundColor: "rgba(250, 249, 245, 0.7)",
+                }}
                 className="transition-colors group"
               >
-                {/* Kolom No */}
+                {/* Nomor urut */}
                 <td className="py-4 text-center text-neutral-600 font-medium">
-                  {index + 1}
+                  {startIndex + index + 1}
                 </td>
 
-                {/* Kolom Gambar Thumbnail */}
+                {/* Gambar */}
                 <td className="py-4">
                   <div className="relative w-16 h-12 rounded-xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-100">
                     <Image
@@ -94,19 +140,19 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
                   </div>
                 </td>
 
-                {/* Kolom Nama Tempat */}
+                {/* Nama tempat */}
                 <td className="py-4 font-medium text-neutral-800">
                   {item.name}
                 </td>
 
-                {/* Kolom Kategori Badge */}
+                {/* Kategori */}
                 <td className="py-4 text-center">
                   <span className="inline-block px-3 py-1 bg-neutral-100/90 text-neutral-600 rounded-full text-[11px] font-medium border border-neutral-200/50">
                     {item.category}
                   </span>
                 </td>
 
-                {/* Kolom Status Badge */}
+                {/* Status */}
                 <td className="py-4 text-center">
                   <span
                     className={`inline-block px-4 py-1 rounded-full text-[11px] font-medium ${
@@ -119,7 +165,7 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
                   </span>
                 </td>
 
-                {/* Kolom Aksi (Edit & Hapus) */}
+                {/* Aksi */}
                 <td className="py-4 text-center">
                   <RowActions
                     label="Tempat"
@@ -134,8 +180,13 @@ export default function PlacesTable({ data, onEdit, onDelete }: PlacesTableProps
         </table>
       </div>
 
-      {/* Bagian Bawah: Informasi Data & Pagination Semantik */}
-      <TablePagination summary="Menampilkan 1-5 dari 28 detail" totalPages={5} />
+      {/* Pagination */}
+      <TablePagination
+        summary={summary}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </article>
   );
 }

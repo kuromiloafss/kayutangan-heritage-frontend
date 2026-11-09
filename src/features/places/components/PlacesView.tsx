@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -15,11 +16,16 @@ export default function PlacesView() {
     selectedCategory,
     setSelectedCategory,
     filteredPlaces,
+    loading,
+    editingPlace,
     handleEdit,
+    handleCloseEdit,
     handleDelete,
     handleAddNewPlace,
+    handleUpdatePlace,
   } = usePlaces();
-  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
     <>
@@ -31,9 +37,23 @@ export default function PlacesView() {
       >
         <ManagementHeader
           icon={
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
           }
           title="Kelola Tempat"
@@ -46,6 +66,12 @@ export default function PlacesView() {
           onAddClick={() => setIsAddModalOpen(true)}
         />
 
+        {loading && (
+          <p className="text-sm text-neutral-500">
+            Memuat data tempat...
+          </p>
+        )}
+
         <PlacesTable
           data={filteredPlaces}
           onEdit={handleEdit}
@@ -57,6 +83,14 @@ export default function PlacesView() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddNewPlace}
+      />
+
+      <AddPlaceModal
+        key={editingPlace?.id ?? "edit-place"}
+        isOpen={Boolean(editingPlace)}
+        onClose={handleCloseEdit}
+        onSubmit={handleUpdatePlace}
+        initialData={editingPlace}
       />
     </>
   );
