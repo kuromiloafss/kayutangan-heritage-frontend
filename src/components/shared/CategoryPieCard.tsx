@@ -10,7 +10,12 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
+interface CategoryPieCardProps {
+  role?: string;
+  loketId?: number | null;
+}
+
+const superadminData = [
   {
     name: "Warlok",
     value: 75,
@@ -27,6 +32,40 @@ const data = [
   },
 ];
 
+const loket1Data = [
+  {
+    name: "Warlok",
+    value: 70,
+    pendapatan: 850000,
+    tiket: 98,
+    color: "#756CE8",
+  },
+  {
+    name: "Turis",
+    value: 30,
+    pendapatan: 350000,
+    tiket: 42,
+    color: "#55C1AD",
+  },
+];
+
+const loket2Data = [
+  {
+    name: "Warlok",
+    value: 60,
+    pendapatan: 1080000,
+    tiket: 121,
+    color: "#756CE8",
+  },
+  {
+    name: "Turis",
+    value: 40,
+    pendapatan: 720000,
+    tiket: 81,
+    color: "#55C1AD",
+  },
+];
+
 const formatRupiah = (value: number) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -34,10 +73,19 @@ const formatRupiah = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-export default function CategoryPieCard() {
+export default function CategoryPieCard({
+  role = "superadmin",
+  loketId = null,
+}: CategoryPieCardProps) {
+  const data =
+    role === "loket"
+      ? loketId === 1
+        ? loket1Data
+        : loket2Data
+      : superadminData;
+
   return (
     <article className="bg-white rounded-2xl p-5 border border-neutral-200 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)]">
-      {/* Header */}
       <header className="flex items-start gap-3 mb-5">
         <div className="w-9 h-9 rounded-full bg-neutral-50 border border-neutral-200 flex items-center justify-center shrink-0">
           <svg
@@ -65,9 +113,7 @@ export default function CategoryPieCard() {
         </div>
       </header>
 
-      {/* Chart dan Informasi */}
       <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-5">
-        {/* Pie Chart dan Legend */}
         <div className="w-full flex flex-col items-center">
           <div className="w-full h-40">
             <ResponsiveContainer width="100%" height="100%">
@@ -95,7 +141,6 @@ export default function CategoryPieCard() {
             </ResponsiveContainer>
           </div>
 
-          {/* Keterangan di bawah diagram */}
           <div className="flex items-center justify-center gap-3 -mt-1">
             {data.map((item) => (
               <div
@@ -114,7 +159,6 @@ export default function CategoryPieCard() {
           </div>
         </div>
 
-        {/* Detail Kategori */}
         <div className="flex flex-col gap-3">
           {data.map((item) => (
             <div

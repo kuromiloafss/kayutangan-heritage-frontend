@@ -16,6 +16,8 @@ import {
 interface IncomeChartCardProps {
   startDate?: string;
   endDate?: string;
+  role?: string;
+  loketId?: number | null;
 }
 
 const formatRupiah = (value: number) =>
@@ -34,6 +36,8 @@ const formatLabel = (date: Date) =>
 export default function IncomeChartCard({
   startDate,
   endDate,
+  role = "superadmin",
+  loketId = null,
 }: IncomeChartCardProps) {
   const data = useMemo(() => {
     if (!startDate || !endDate) return [];
@@ -54,23 +58,35 @@ export default function IncomeChartCard({
     let index = 0;
 
     while (current <= end && index < 366) {
-      result.push({
-        tanggal: formatLabel(current),
-        warlok: 500000 + ((index * 137000) % 600000),
-        turis: 200000 + ((index * 97000) % 400000),
-      });
+      if (role === "loket") {
+        result.push({
+          tanggal: formatLabel(current),
+          pendapatan:
+            loketId === 1
+              ? 150000 + ((index * 85000) % 350000)
+              : 200000 + ((index * 110000) % 450000),
+        });
+      } else {
+        result.push({
+          tanggal: formatLabel(current),
+          warlok: 500000 + ((index * 137000) % 600000),
+          turis: 200000 + ((index * 97000) % 400000),
+        });
+      }
 
       current.setDate(current.getDate() + 1);
       index++;
     }
 
     return result;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, role, loketId]);
 
   const periodLabel =
     startDate && endDate
       ? `${startDate} - ${endDate}`
       : "Pilih periode";
+
+  const isLoket = role === "loket";
 
   return (
     <article className="bg-white rounded-2xl p-5 border border-neutral-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)]">
@@ -80,7 +96,9 @@ export default function IncomeChartCard({
         </h2>
 
         <p className="text-[11px] text-neutral-400">
-          Perbandingan pendapatan Warlok dan Turis.
+          {isLoket
+            ? `Pendapatan tiket Loket ${loketId}`
+            : "Perbandingan pendapatan Warlok dan Turis."}
         </p>
 
         <p className="text-[10px] text-neutral-400 mt-1">
@@ -135,25 +153,39 @@ export default function IncomeChartCard({
                 }}
               />
 
-              <Line
-                type="monotone"
-                dataKey="warlok"
-                name="Warlok"
-                stroke="#7772E8"
-                strokeWidth={2}
-                dot={{ r: 2 }}
-                activeDot={{ r: 5 }}
-              />
+              {isLoket ? (
+                <Line
+                  type="monotone"
+                  dataKey="pendapatan"
+                  name={`Loket ${loketId}`}
+                  stroke="#7772E8"
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  activeDot={{ r: 5 }}
+                />
+              ) : (
+                <>
+                  <Line
+                    type="monotone"
+                    dataKey="warlok"
+                    name="Warlok"
+                    stroke="#7772E8"
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 5 }}
+                  />
 
-              <Line
-                type="monotone"
-                dataKey="turis"
-                name="Turis"
-                stroke="#50C5B5"
-                strokeWidth={2}
-                dot={{ r: 2 }}
-                activeDot={{ r: 5 }}
-              />
+                  <Line
+                    type="monotone"
+                    dataKey="turis"
+                    name="Turis"
+                    stroke="#50C5B5"
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </>
+              )}
             </LineChart>
           </ResponsiveContainer>
         ) : (

@@ -5,9 +5,12 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+type LoginType = "superadmin" | "loket1" | "loket2";
+
 export default function LoginView() {
   const [identifier, setIdentifier] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loginType, setLoginType] = useState<LoginType>("superadmin");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -20,6 +23,11 @@ export default function LoginView() {
     // Validasi email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Masukkan alamat email yang valid.");
+      return;
+    }
+
+    if (!password) {
+      setError("Password wajib diisi.");
       return;
     }
 
@@ -38,6 +46,7 @@ export default function LoginView() {
         body: JSON.stringify({
           email,
           password,
+          loginType,
         }),
       });
 
@@ -52,10 +61,17 @@ export default function LoginView() {
         return;
       }
 
-      // Simpan token login
+      // Simpan token dan informasi akun
       localStorage.setItem("token", result.data.token);
 
-      // Masuk ke dashboard setelah login berhasil
+      if (result.data.user) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(result.data.user)
+        );
+      }
+
+      // Masuk ke dashboard
       window.location.href = "/dashboard";
     } catch {
       setError(
@@ -117,7 +133,7 @@ export default function LoginView() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="w-full max-w-lg relative z-20 pb-16"
         >
-          {/* Logo Mobile */}
+          {/* LOGO MOBILE */}
           <div className="md:hidden flex flex-col items-center text-center mb-10">
             <div className="relative w-20 h-14 mb-1">
               <Image
@@ -152,6 +168,29 @@ export default function LoginView() {
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* PILIH JENIS AKUN */}
+            <div className="space-y-2">
+              <label
+                htmlFor="loginType"
+                className="block text-sm font-medium text-[#2a3821]"
+              >
+                Masuk sebagai
+              </label>
+
+              <select
+                id="loginType"
+                value={loginType}
+                onChange={(e) =>
+                  setLoginType(e.target.value as LoginType)
+                }
+                className="w-full px-5 py-3.5 bg-[#f3f4f6] border border-neutral-200/90 rounded-2xl text-neutral-800 focus:outline-none focus:ring-2 focus:ring-[#718255] focus:bg-white transition-all text-base shadow-sm cursor-pointer"
+              >
+                <option value="superadmin">Superadmin</option>
+                <option value="loket1">Loket 1</option>
+                <option value="loket2">Loket 2</option>
+              </select>
+            </div>
+
             {/* INPUT EMAIL */}
             <div className="relative flex items-center">
               <label htmlFor="identifier" className="sr-only">

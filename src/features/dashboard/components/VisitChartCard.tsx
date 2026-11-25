@@ -2,11 +2,21 @@
 "use client";
 
 import React, { useMemo } from "react";
-import {ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,} from "recharts";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 interface VisitChartCardProps {
   startDate?: string;
   endDate?: string;
+  role?: string;
+  loketId?: number | null;
 }
 
 const formatLabel = (date: Date) =>
@@ -17,6 +27,8 @@ const formatLabel = (date: Date) =>
 export default function VisitChartCard({
   startDate,
   endDate,
+  role = "superadmin",
+  loketId = null,
 }: VisitChartCardProps) {
   const data = useMemo(() => {
     if (!startDate || !endDate) return [];
@@ -37,9 +49,18 @@ export default function VisitChartCard({
     let index = 0;
 
     while (current <= end && index < 366) {
+      let kunjungan = 20 + ((index * 17 + 31) % 70);
+
+      if (role === "loket") {
+        kunjungan =
+          loketId === 1
+            ? 10 + ((index * 13 + 15) % 45)
+            : 15 + ((index * 19 + 20) % 60);
+      }
+
       result.push({
         tanggal: formatLabel(current),
-        kunjungan: 20 + ((index * 17 + 31) % 70),
+        kunjungan,
       });
 
       current.setDate(current.getDate() + 1);
@@ -47,11 +68,10 @@ export default function VisitChartCard({
     }
 
     return result;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, role, loketId]);
 
   return (
     <article className="bg-white rounded-2xl p-5 border border-neutral-200 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)]">
-      {/* Header */}
       <header className="flex items-start gap-3 mb-5">
         <div className="w-9 h-9 rounded-full bg-neutral-50 border border-neutral-200 flex items-center justify-center shrink-0">
           <svg
@@ -74,12 +94,13 @@ export default function VisitChartCard({
             Grafik Kunjungan
           </h2>
           <p className="text-[11px] text-neutral-400 mt-1">
-            Total kunjungan wisatawan dalam periode yang dipilih.
+            {role === "loket"
+              ? `Jumlah kunjungan yang dilayani Loket ${loketId}.`
+              : "Total kunjungan wisatawan dalam periode yang dipilih."}
           </p>
         </div>
       </header>
 
-      {/* Line Chart */}
       <div className="h-44 w-full">
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">

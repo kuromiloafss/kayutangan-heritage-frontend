@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -9,30 +10,60 @@ import PeriodModal, {
 interface DashboardHeaderProps {
   selectedPeriod: PeriodSelection;
   onSelectPeriod: (period: PeriodSelection) => void;
+  role: "superadmin" | "loket";
+  loketId: number | null;
 }
 
 export default function DashboardHeader({
   selectedPeriod,
   onSelectPeriod,
+  role,
+  loketId,
 }: DashboardHeaderProps) {
   const [isPeriodModalOpen, setIsPeriodModalOpen] = useState(false);
+
+  const dashboardTitle =
+    role === "superadmin"
+      ? "Dashboard Admin"
+      : `Dashboard Loket ${loketId}`;
+
+  const welcomeMessage =
+    role === "superadmin"
+      ? "Selamat datang, Superadmin!"
+      : `Selamat datang, Petugas Loket ${loketId}!`;
+
+  const accountLabel =
+    role === "superadmin"
+      ? "Superadmin"
+      : `Loket ${loketId}`;
 
   return (
     <>
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-full bg-white shadow-xs flex items-center justify-center text-neutral-600 border border-neutral-200/60 shrink-0">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
             </svg>
           </div>
 
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#2a3821] tracking-tight">
-              Dashboard Admin
+              {dashboardTitle}
             </h1>
+
             <p className="text-xs text-neutral-400 mt-0.5">
-              Selamat datang, Admin!
+              {welcomeMessage}
             </p>
           </div>
         </div>
@@ -45,27 +76,58 @@ export default function DashboardHeader({
             onClick={() => setIsPeriodModalOpen(true)}
             className="flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200/90 rounded-2xl text-xs text-neutral-600 shadow-xs hover:bg-neutral-50 transition cursor-pointer"
           >
-            <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-4 h-4 text-neutral-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
 
             <span className="font-medium text-neutral-700">
               {selectedPeriod.label}
             </span>
 
-            <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            <svg
+              className="w-3.5 h-3.5 text-neutral-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </motion.button>
 
           <div className="hidden sm:flex shrink-0 items-center gap-2 bg-white border border-neutral-200/80 px-3 py-1.5 rounded-full shadow-xs">
             <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-600">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
+
             <span className="text-xs font-semibold text-neutral-700">
-              Admin
+              {accountLabel}
             </span>
           </div>
         </div>
